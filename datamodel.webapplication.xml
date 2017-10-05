@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <classes>
+    <class id="WebApplication">
+      <fields>
+        <field id="webproxy_list" xsi:type="AttributeLinkedSetIndirect" _delta="define">
+          <linked_class>LnkWebProxyToWebApplication</linked_class>
+          <ext_key_to_me>webapplication_id</ext_key_to_me>
+          <count_min>0</count_min>
+          <count_max>0</count_max>
+          <ext_key_to_remote>webproxy_id</ext_key_to_remote>
+          <duplicates/>
+        </field>
+      </fields>
+      <presentation>
+        <details _delta="redefine">
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="org_id">
+              <rank>20</rank>
+            </item>
+            <item id="webserver_id">
+              <rank>30</rank>
+            </item>
+            <item id="url">
+              <rank>40</rank>
+            </item>
+            <item id="business_criticity">
+              <rank>50</rank>
+            </item>
+            <item id="move2production">
+              <rank>60</rank>
+            </item>
+            <item id="description">
+              <rank>70</rank>
+            </item>
+            <item id="contacts_list">
+              <rank>100</rank>
+            </item>
+            <item id="documents_list">
+              <rank>110</rank>
+            </item>
+            <item id="webproxy_list">
+              <rank>120</rank>
+            </item>
+            <item id="applicationsolution_list">
+              <rank>130</rank>
+            </item>
+            <item id="providercontracts_list">
+              <rank>140</rank>
+            </item>
+            <item id="services_list">
+              <rank>150</rank>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="org_id">
+              <rank>20</rank>
+            </item>
+            <item id="business_criticity">
+              <rank>30</rank>
+            </item>
+            <item id="move2production">
+              <rank>40</rank>
+            </item>
+          </items>
+        </search>
+        <list>
+          <items>
+            <item id="org_id">
+              <rank>10</rank>
+            </item>
+            <item id="business_criticity">
+              <rank>20</rank>
+            </item>
+            <item id="move2production">
+              <rank>30</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+      <methods/>
+      <relations>
+        <relation id="impacts">
+          <neighbours>
+            <neighbour id="webproxy" _delta="define">
+              <query_down>SELECT WebProxy AS w JOIN LnkWebProxyToWebApplication AS l1 ON l1.webproxy_id = w.id JOIN WebApplication AS t ON l1.webapplication_id = t.id WHERE t.id = webproxy_id</query_down>
+              <query_up>SELECT WebApplication AS w JOIN LnkWebProxyToWebApplication AS l1 ON l1.webapplication_id = w.id  JOIN WebProxy AS t ON l1.webproxy_id = t.id WHERE t.id = :this->id</query_up>
+            </neighbour>
+          </neighbours>
+        </relation>
+      </relations>      
+    </class>    
+  </classes>
+</itop_design>

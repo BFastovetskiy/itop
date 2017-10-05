@@ -22,8 +22,6 @@
             <attribute id="name"/>
             <attribute id="org_id"/>
             <attribute id="organization_name"/>
-            <attribute id="business_criticity"/>
-            <attribute id="move2production"/>
           </attributes>
         </reconciliation>
       </properties>
@@ -42,6 +40,7 @@
         <field id="webapplication_list" xsi:type="AttributeLinkedSetIndirect">
           <linked_class>LnkWebProxyToWebApplication</linked_class>
           <ext_key_to_me>webproxy_id</ext_key_to_me>
+          <edit_mode>in_place</edit_mode>
           <count_min>0</count_min>
           <count_max>0</count_max>
           <ext_key_to_remote>webapplication_id</ext_key_to_remote>
@@ -57,6 +56,7 @@
           <min_up>1</min_up>
           <min_up_type>count</min_up_type>
           <min_up_mode>user</min_up_mode>
+          <edit_mode>in_place</edit_mode>
         </field>        
       </fields>
       <presentation>
@@ -83,6 +83,9 @@
             <item id="webproxycluster_id">
               <rank>70</rank>
             </item>
+            <item id="description">
+              <rank>80</rank>
+            </item>            
             <item id="contacts_list">
               <rank>100</rank>
             </item>
@@ -106,8 +109,11 @@
               <attribute>applicationsolution_list</attribute>
             </neighbour> 
             <neighbour id="webproxycluster" _delta="define">
+              <attribute>webproxycluster_id</attribute>
+              <!--
               <query_down>SELECT WebProxyCluster AS w WHERE w.id = :this->id</query_down>
               <query_up>SELECT WebProxy AS w WHERE w.webproxycluster_id = :this->id</query_up>
+              -->
             </neighbour>                     
           </neighbours>
         </relation>

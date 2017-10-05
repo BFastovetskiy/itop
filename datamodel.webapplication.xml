@@ -8,6 +8,7 @@
           <ext_key_to_me>webapplication_id</ext_key_to_me>
           <count_min>0</count_min>
           <count_max>0</count_max>
+          <edit_mode>in_place</edit_mode>
           <ext_key_to_remote>webproxy_id</ext_key_to_remote>
           <duplicates/>
         </field>
@@ -91,8 +92,11 @@
         <relation id="impacts">
           <neighbours>
             <neighbour id="webproxy" _delta="define">
+              <attribute>webproxy_list</attribute>
+              <!--
               <query_down>SELECT WebProxy AS w JOIN LnkWebProxyToWebApplication AS l1 ON l1.webproxy_id = w.id JOIN WebApplication AS t ON l1.webapplication_id = t.id WHERE t.id = webproxy_id</query_down>
               <query_up>SELECT WebApplication AS w JOIN LnkWebProxyToWebApplication AS l1 ON l1.webapplication_id = w.id  JOIN WebProxy AS t ON l1.webproxy_id = t.id WHERE t.id = :this->id</query_up>
+              -->
             </neighbour>
           </neighbours>
         </relation>

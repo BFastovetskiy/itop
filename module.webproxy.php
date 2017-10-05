@@ -9,7 +9,7 @@ SetupWebPage::AddModule(
 	array(
 		// Identification
 		//
-		'label' => 'Append new CI (WebProxy) in CMDB',
+		'label' => 'Append new CI (WebProxy, WebProxyCluster) in CMDB',
 		'category' => 'business',
 
 		// Setup

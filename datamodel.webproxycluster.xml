@@ -31,7 +31,7 @@
         <field id="webproxy_list" xsi:type="AttributeLinkedSet">
           <linked_class>WebProxy</linked_class>
           <ext_key_to_me>webproxycluster_id</ext_key_to_me>
-          <edit_mode>add_only</edit_mode>
+          <edit_mode>in_place</edit_mode>
           <count_min>0</count_min>
           <count_max>0</count_max>
         </field>
@@ -45,6 +45,7 @@
           <min_up>1</min_up>
           <min_up_type>count</min_up_type>
           <min_up_mode>user</min_up_mode>
+          <edit_mode>in_place</edit_mode>
         </field>        
       </fields>
       <presentation>

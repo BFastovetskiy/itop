@@ -1,6 +1,10 @@
 # iTop
 ## Added the new objects in CMDB
 
+### Many thanks
+
+Many thanks to the Russian community iTop. Although they did not answer my questions... They encouraged me to develop my own customization of the product. On the site http://itop-itsm.ru a large number of good and quality advice.
+
 ### Objects:
 
 1. WebProxy - an object can include multiple WebApplications.
@@ -16,3 +20,8 @@
 2. ~~Add cross link WebApplication on WebApplication~~
 3. Add new CMDB object - DBCluster
 4. Add objects to the Docker environment
+
+### Other
+
+With questions and suggestions, you can contact me via Telegram @BorisFastovetskiy
+I will accept from you any thanks :)

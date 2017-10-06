@@ -14,7 +14,7 @@ Many thanks to the Russian community iTop. Although they did not answer my quest
 5. Added to DatabaseSchema the impact on WebApplications
 6. Add cross link WebApplication on WebApplication
 
-### Palns:
+### Plans:
 
 1. ~~Added to DatabaseSchema the impact on WebApplications~~
 2. ~~Add cross link WebApplication on WebApplication~~
@@ -23,5 +23,6 @@ Many thanks to the Russian community iTop. Although they did not answer my quest
 
 ### Other
 
-With questions and suggestions, you can contact me via Telegram @BorisFastovetskiy
+With questions and suggestions, you can contact me via Telegram @BorisFastovetskiy.
+
 I will accept from you any thanks :)

@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'WebProxy/1.0.17',
+	'custom-cmdb/1.0.18',
 	array(
 		// Identification
 		//
@@ -23,7 +23,7 @@ SetupWebPage::AddModule(
 		// Components
 		//
 		'datamodel' => array(
-			'model.webproxy.php'
+			'model.custom-cmdb.php'
 		),
 		'webservice' => array(
 			

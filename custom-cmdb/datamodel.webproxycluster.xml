@@ -28,6 +28,11 @@
         </reconciliation>
       </properties>
       <fields>
+        <field id="uplink_ipaddress" xsi:type="AttributeIPAddress">
+          <sql>uplinkipaddress</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
         <field id="webproxy_list" xsi:type="AttributeLinkedSet">
           <linked_class>WebProxy</linked_class>
           <ext_key_to_me>webproxycluster_id</ext_key_to_me>
@@ -66,17 +71,23 @@
             <item id="move2production">
               <rank>50</rank>
             </item>
-            <item id="contacts_list">
+            <item id="uplink_ipaddress">
+              <rank>60</rank>
+            </item>
+            <item id="description">
               <rank>70</rank>
             </item>
+            <item id="contacts_list">
+              <rank>100</rank>
+            </item>
             <item id="documents_list">
-              <rank>80</rank>
+              <rank>110</rank>
             </item>
             <item id="applicationsolution_list">
-              <rank>90</rank>
+              <rank>120</rank>
             </item>
             <item id="webproxy_list">
-              <rank>100</rank>
+              <rank>130</rank>
             </item>
           </items>
         </details>

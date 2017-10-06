@@ -110,10 +110,6 @@
             </neighbour> 
             <neighbour id="webproxycluster" _delta="define">
               <attribute>webproxycluster_id</attribute>
-              <!--
-              <query_down>SELECT WebProxyCluster AS w WHERE w.id = :this->id</query_down>
-              <query_up>SELECT WebProxy AS w WHERE w.webproxycluster_id = :this->id</query_up>
-              -->
             </neighbour>                     
           </neighbours>
         </relation>

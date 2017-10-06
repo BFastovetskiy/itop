@@ -19,10 +19,10 @@
 	'Class:WebProxy/Attribute:redundancy/disabled' => 'Прикладное решение в работе, если все КЕ в работе',
 	'Class:WebProxy/Attribute:redundancy/count' => 'Прикладное решение в работе, если по крайней мере %1$s КЕ в работе',
 	'Class:WebProxy/Attribute:redundancy/percent' => 'Прикладное решение в работе, если по крайней мере %1$s %% КЕ в работе',
-	'Class:WebApplication/Attribute:webproxy_id' => 'Web прокси',
-	'Class:WebApplication/Attribute:webproxy_id+' => '',
 	'Class:WebApplication/Attribute:webproxy_list' => 'Web прокси',
-	'Class:WebApplication/Attribute:webproxy_list+' => '',
+	'Class:WebApplication/Attribute:webproxy_list+' => 'Связанные Web прокси',
+	'Class:WebApplication/Attribute:databaseschema_list' => 'Схемы баз данных',
+	'Class:WebApplication/Attribute:databaseschema_list+' => 'Связанные схемы баз данных',
 	'Class:LnkWebProxyToWebApplication' => 'Связь Web прокси с Web приложениями',
 	'Class:LnkWebProxyToWebApplication+' => '',
 	'Class:LnkWebProxyToWebApplication/Attribute:webproxy_id' => 'Web прокси',
@@ -31,13 +31,22 @@
 	'Class:LnkWebProxyToWebApplication/Attribute:webapplication_id+' => '',
 	'Class:WebProxyCluster' => 'Кластер Web прокси',
 	'Class:WebProxyCluster+' => '',
+	'Class:WebProxyCluster/Attribute:uplink_ipaddress' => 'IP адрес uplink',
 	'Class:WebProxyCluster/Attribute:webproxy_list' => 'Web прокси',
-	'Class:WebProxyCluster/Attribute:webproxy_list+' => '',
+	'Class:WebProxyCluster/Attribute:webproxy_list+' => 'Связанные Web прокси',
 	'Class:WebProxyCluster/Attribute:redundancy' => 'Анализ влияния: конфигурация резервирования',
 	'Class:WebProxyCluster/Attribute:redundancy/disabled' => 'Прикладное решение в работе, если все КЕ в работе',
 	'Class:WebProxyCluster/Attribute:redundancy/count' => 'Прикладное решение в работе, если по крайней мере %1$s КЕ в работе',
 	'Class:WebProxyCluster/Attribute:redundancy/percent' => 'Прикладное решение в работе, если по крайней мере %1$s %% КЕ в работе',
-	
-	
+	'Class:DatabaseSchema/Attribute:webapplication_list' => 'Web приложения',
+	'Class:DatabaseSchema/Attribute:webapplication_list+' => 'Связанные Web приложения',
+	'Class:LnkDatabaseSchemaToWebApplication' => 'Связь Web приложений со схемами баз данных',
+	'Class:LnkDatabaseSchemaToWebApplication+' => '',
+	'Class:LnkDatabaseSchemaToWebApplication/Attribute:databaseschema_id' => 'Схемы баз данных',
+	'Class:LnkDatabaseSchemaToWebApplication/Attribute:databaseschema_id+' => '',
+	'Class:LnkDatabaseSchemaToWebApplication/Attribute:webapplication_id' => 'Web приложения',
+	'Class:LnkDatabaseSchemaToWebApplication/Attribute:webapplication_id+' => '',
+
+
 ));
 ?>

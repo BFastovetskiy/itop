@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
   <classes>
-    <class id="WebApplication">
+    <class id="DatabaseSchema">
       <fields>
-        <field id="webproxy_list" xsi:type="AttributeLinkedSetIndirect" _delta="define">
-          <linked_class>LnkWebProxyToWebApplication</linked_class>
-          <ext_key_to_me>webapplication_id</ext_key_to_me>
+        <field id="webapplication_list" xsi:type="AttributeLinkedSetIndirect" _delta="define">
+          <linked_class>LnkDatabaseSchemaToWebApplication</linked_class>
+          <ext_key_to_me>databaseschema_id</ext_key_to_me>
           <count_min>0</count_min>
           <count_max>0</count_max>
           <edit_mode>in_place</edit_mode>
-          <ext_key_to_remote>webproxy_id</ext_key_to_remote>
+          <ext_key_to_remote>webapplication_id</ext_key_to_remote>
           <duplicates/>
         </field>
-        <field id="databaseschema_list" xsi:type="AttributeLinkedSetIndirect" _delta="define">
-          <linked_class>LnkDatabaseSchemaToWebApplication</linked_class>
-          <ext_key_to_me>webapplication_id</ext_key_to_me>
-          <count_min>0</count_min>
-          <count_max>0</count_max>
-          <edit_mode>in_place</edit_mode>
-          <ext_key_to_remote>databaseschema_id</ext_key_to_remote>
-          <duplicates/>
-        </field>        
       </fields>
       <presentation>
-        <details _delta="redefine">
+        <details>
           <items>
             <item id="name">
               <rank>10</rank>
@@ -31,20 +22,17 @@
             <item id="org_id">
               <rank>20</rank>
             </item>
-            <item id="webserver_id">
+            <item id="dbserver_id">
               <rank>30</rank>
             </item>
-            <item id="url">
+            <item id="business_criticity">
               <rank>40</rank>
             </item>
-            <item id="business_criticity">
+            <item id="move2production">
               <rank>50</rank>
             </item>
-            <item id="move2production">
-              <rank>60</rank>
-            </item>
             <item id="description">
-              <rank>70</rank>
+              <rank>60</rank>
             </item>
             <item id="contacts_list">
               <rank>100</rank>
@@ -52,20 +40,17 @@
             <item id="documents_list">
               <rank>110</rank>
             </item>
-            <item id="databaseschema_list">
+            <item id="webapplication_list">
               <rank>120</rank>
             </item>
-            <item id="webproxy_list">
+            <item id="applicationsolution_list">
               <rank>130</rank>
             </item>
-            <item id="applicationsolution_list">
+            <item id="providercontracts_list">
               <rank>140</rank>
             </item>
-            <item id="providercontracts_list">
-              <rank>150</rank>
-            </item>
             <item id="services_list">
-              <rank>160</rank>
+              <rank>150</rank>
             </item>
           </items>
         </details>
@@ -103,12 +88,12 @@
       <relations>
         <relation id="impacts">
           <neighbours>
-            <neighbour id="webproxy" _delta="define">
-              <attribute>webproxy_list</attribute>
+            <neighbour id="webapplication" _delta="define">
+              <attribute>webapplication_list</attribute>
             </neighbour>
           </neighbours>
         </relation>
       </relations>      
     </class>    
   </classes>
-</itop_design>
+</itop_design>  

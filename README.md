@@ -11,8 +11,10 @@ Many thanks to the Russian community iTop. Although they did not answer my quest
 2. WebProxyCluster - an object can include multiple WebProxy
 3. LnkWebProxyToWebApplication - The object as the implementation link for several DatabaseSchema on the several WebApplication
 4. LnkDatabaseSchemaToWebApplication - The object as the implementation link for several WebProxy on the several WebApplication
-5. Added to DatabaseSchema the impact on WebApplications
-6. Add cross link WebApplication on WebApplication
+5. CustomActionTelegram - Added a new trigger action - Telegram notification, for ITIL events (in developing)
+5. CustomActionZabbix - Added a new trigger action - Zabbix update, for CMDB events (in developing)
+7. Added to DatabaseSchema the impact on WebApplications 
+8. Add cross link WebApplication on WebApplication
 
 ### Plans:
 

@@ -14,6 +14,7 @@ Many thanks to the Russian community iTop. Although they did not answer my quest
 5. Added new classes a the trigger action and the event action for Telegram notification (ActionTelegram & EventNotificationTelegram)
 6. Added to DatabaseSchema the impact on WebApplications 
 7. Add cross link WebApplication on WebApplication
+8. Added translation into Russian to the Advanced Approval Module
 
 ### Plans:
 

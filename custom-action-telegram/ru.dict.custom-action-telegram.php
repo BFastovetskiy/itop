@@ -7,6 +7,8 @@ Dict::Add('RU RU', 'Russian', 'Русский', array(
 	'Class:ActionTelegram/Attribute:bot_id+' => '',
 	'Class:ActionTelegram/Attribute:chat_id' => 'ID чата',
 	'Class:ActionTelegram/Attribute:chat_id+' => '',
+	'Class:ActionTelegram/Attribute:subject' => 'Текст увдомления',
+	'Class:ActionTelegram/Attribute:subject+' => '',
 
 	'Class:EventNotificationTelegram' => 'Уведомления через Telegram',
 	'Class:EventNotificationTelegram+' => '',	

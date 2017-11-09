@@ -111,7 +111,7 @@ class ActionTelegram extends ActionNotification
 		try
 		{
 			$m_message = urlencode($subject);
-			$url = "https://api.telegram.org/bot".$botId."/sendMessage?chat_id=".$chatid."&text=".$m_message;
+			$url = "https://api.telegram.org/bot".$botId."/sendMessage?parse_mode=HTML&chat_id=".$chatid."&text=".$m_message;
 
 			$ch = curl_init();
 			$optArray = array(

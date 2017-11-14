@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.3">
+  <classes>
+    <class id="OrganizationType" _delta="define">
+      <parent>Typology</parent>
+      <properties>
+        <category>bizmodel,searchable</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>organization_type</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="organization_list" xsi:type="AttributeLinkedSet">
+          <linked_class>Organization</linked_class>
+          <ext_key_to_me>organizationtype_id</ext_key_to_me>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="organization_list">
+              <rank>20</rank>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+          </items>
+        </search>
+        <list>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+  </classes>
+  <menus>
+    <menu id="Typology" xsi:type="DashboardMenuNode" _delta="must_exist">
+      <rank>80</rank>
+      <parent>Catalogs</parent>
+      <definition>
+        <layout>DashboardLayoutOneCol</layout>
+        <title>Menu:ConfigManagement:Typology</title>
+        <cells>
+          <cell id="0" _delta="must_exist">
+            <rank>0</rank>
+            <dashlets>
+              <dashlet id="12" xsi:type="DashletBadge" _delta="define">
+                <rank>11</rank>
+                <class>OrganizationType</class>
+              </dashlet>
+            </dashlets>
+          </cell>
+        </cells>
+      </definition>
+    </menu>
+  </menus>
+</itop_design>

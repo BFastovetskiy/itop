@@ -50,6 +50,19 @@
 	'Class:LnkDatabaseSchemaToWebApplication/Attribute:webapplication_id' => 'Web приложения',
 	'Class:LnkDatabaseSchemaToWebApplication/Attribute:webapplication_id+' => '',
 
+	'Class:Organization/Attribute:organizationlocation_id' => 'Страна',
+	'Class:Organization/Attribute:organizationlocation_id+' => '',
+	'Class:Organization/Attribute:organizationtype_id' => 'Тип организации',
+	'Class:Organization/Attribute:organizationtype_id+' => '',
 
+	'Class:OrganizationLocation' => 'Страна',
+	'Class:OrganizationLocation+' => '',
+	'Class:OrganizationLocation/Attribute:organization_list' => 'Список организаций',
+	'Class:OrganizationLocation/Attribute:organization_list+' => 'Список организаций расположенных в данной стране',
+	'Class:OrganizationLocation/Attribute:code' => 'Короткий код страны',
+	'Class:OrganizationType' => 'Тип организации',
+	'Class:OrganizationType+' => '',	
+	'Class:OrganizationType/Attribute:organization_list' => 'Список организаций',
+	'Class:OrganizationType/Attribute:organization_list+' => 'Список организаций с данным типом',
 ));
 ?>

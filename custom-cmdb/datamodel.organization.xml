@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <classes>
+    <class id="Organization">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <comment></comment>
+        <category>bizmodel,searchable,structure</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>organization</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon>images/building.png</icon>
+        <reconciliation>
+          <attributes>
+            <attribute id="name"/>
+            <attribute id="code"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="organizationlocation_id" xsi:type="AttributeExternalKey" _delta="define">
+          <sql>organizationlocation_id</sql>
+          <target_class>OrganizationLocation</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="organizationtype_id" xsi:type="AttributeExternalKey" _delta="define">
+          <sql>organizationtype_id</sql>
+          <target_class>OrganizationType</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="code">
+              <rank>20</rank>
+            </item>
+            <item id="status">
+              <rank>30</rank>
+            </item>
+            <item id="parent_id">
+              <rank>40</rank>
+            </item>
+            <item id="organizationlocation_id">
+              <rank>50</rank>
+            </item>
+            <item id="organizationtype_id">
+              <rank>60</rank>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="code">
+              <rank>20</rank>
+            </item>
+            <item id="status">
+              <rank>30</rank>
+            </item>
+            <item id="parent_id">
+              <rank>40</rank>
+            </item>
+            <item id="organizationlocation_id">
+              <rank>50</rank>
+            </item>
+            <item id="organizationtype_id">
+              <rank>60</rank>
+            </item>
+          </items>
+        </search>
+        <list>
+          <items>
+            <item id="code">
+              <rank>10</rank>
+            </item>
+            <item id="status">
+              <rank>20</rank>
+            </item>
+            <item id="parent_id">
+              <rank>30</rank>
+            </item>
+            <item id="organizationlocation_id">
+              <rank>50</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+  </classes>
+</itop_design>  

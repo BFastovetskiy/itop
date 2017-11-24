@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'sample-add-attribute/',
+	'custom-workflow-engine/1.0.0',
 	array(
 		// Identification
 		//
@@ -23,7 +23,7 @@ SetupWebPage::AddModule(
 		// Components
 		//
 		'datamodel' => array(
-			'model.sample-add-attribute.php'
+			'model.custom-workflow-engine.php'
 		),
 		'webservice' => array(
 			

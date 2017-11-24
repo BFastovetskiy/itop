@@ -51,29 +51,29 @@
 					<extkey_attcode>service_id</extkey_attcode>
 					<target_attcode>name</target_attcode>
 				</field>
-				<field id="subserive_id" xsi:type="AttributeExternalKey">
+				<field id="subservice_id" xsi:type="AttributeExternalKey">
 					<filter><![CDATA[SELECT ServiceSubcategory WHERE service_id = :this->service_id]]></filter>
 					<dependencies>
 						<attribute id="service_id"/>
 					</dependencies>
-					<sql>subserive_id</sql>
+					<sql>subservice_id</sql>
 					<target_class>ServiceSubcategory</target_class>
 					<is_null_allowed>false</is_null_allowed>
 					<on_target_delete>DEL_AUTO</on_target_delete>
 				</field>
-				<field id="subserive_name" xsi:type="AttributeExternalField">
-					<extkey_attcode>subserive_id</extkey_attcode>
+				<field id="subservice_name" xsi:type="AttributeExternalField">
+					<extkey_attcode>subservice_id</extkey_attcode>
 					<target_attcode>name</target_attcode>
 				</field>
 				<field id="team_id" xsi:type="AttributeExternalKey">
 					<sql>team_id</sql>
 					<target_class>Team</target_class>
-					<is_null_allowed>false</is_null_allowed>
+					<is_null_allowed>true</is_null_allowed>
 					<on_target_delete>DEL_AUTO</on_target_delete>
 				</field>
 				<field id="team_name" xsi:type="AttributeExternalField">
 					<extkey_attcode>team_id</extkey_attcode>
-					<target_attcode>friendlyname</target_attcode>
+					<target_attcode>name</target_attcode>
 				</field>
 				<field id="agent_id" xsi:type="AttributeExternalKey">
 					<filter><![CDATA[SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id=p.id JOIN Team AS t ON l.team_id=t.id WHERE t.id = :this->team_id]]></filter>
@@ -82,14 +82,20 @@
 					</dependencies>
 					<sql>agent_id</sql>
 					<target_class>Person</target_class>
-					<is_null_allowed>false</is_null_allowed>
+					<is_null_allowed>true</is_null_allowed>
 					<on_target_delete>DEL_AUTO</on_target_delete>
 					<allow_target_creation>false</allow_target_creation>
 				</field>
 				<field id="agent_name" xsi:type="AttributeExternalField">
 					<extkey_attcode>agent_id</extkey_attcode>
-					<target_attcode>friendlyname</target_attcode>
+					<target_attcode>name</target_attcode>
 				</field>
+        <field id="workflowtemplateitem_list" xsi:type="AttributeLinkedSet">
+          <linked_class>WorkflowTemplateItem</linked_class>
+          <ext_key_to_me>workflowtemplate_id</ext_key_to_me>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
       </fields>
       <methods/>
       <presentation>
@@ -118,10 +124,10 @@
                     <item id="service_name">
                       <rank>30</rank>
                     </item>
-                    <item id="subserive_id">
+                    <item id="subservice_id">
                       <rank>40</rank>
                     </item>
-                    <item id="subserive_name">
+                    <item id="subservice_name">
                       <rank>50</rank>
                     </item>
                     <item id="team_id">
@@ -153,6 +159,9 @@
                 </item>
               </items>
             </item>
+            <item id="workflowtemplateitem_list">
+              <rank>30</rank>
+            </item>            
           </items>
         </details>
         <search>
@@ -164,8 +173,14 @@
         </search>
         <list>
           <items>
-            <item id="name">
+            <item id="is_enabled">
               <rank>10</rank>
+            </item>
+            <item id="service_id">
+              <rank>20</rank>
+            </item>
+            <item id="subservice_id">
+              <rank>30</rank>
             </item>
           </items>
         </list>
@@ -173,11 +188,16 @@
     </class>
   </classes>
   <menus>
+    <menu id="Workflows" xsi:type="TemplateMenuNode" _delta="define">
+      <rank>1000</rank>
+      <parent>ServiceManagement</parent>
+      <template_file/>
+    </menu>
     <menu id="WorkflowTemplate" xsi:type="OQLMenuNode" _delta="define">
       <rank>100</rank>
-      <parent>ServiceManagement</parent>
+      <parent>Workflows</parent>
       <oql>SELECT WorkflowTemplate</oql>
-      <do_search>1</do_search>
+      <!--<do_search>1</do_search>-->
     </menu>
   </menus>
 </itop_design>

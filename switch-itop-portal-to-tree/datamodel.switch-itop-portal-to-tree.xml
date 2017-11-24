@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  version="1.0">
+  <module_designs>
+    <module_design id="itop-portal" xsi:type="portal">
+      <bricks>
+        <brick id="services" xsi:type="Combodo\iTop\Portal\Brick\BrowseBrick">
+          <browse_modes>
+            <default _delta="redefine">tree</default>
+          </browse_modes>
+        </brick>
+      </bricks>
+    </module_design>
+  </module_designs>
+</itop_design>

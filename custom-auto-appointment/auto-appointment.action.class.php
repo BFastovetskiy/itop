@@ -56,7 +56,8 @@ class AutoAppointment extends ActionNotification
 		$min = self::FIRST_MIN_VALUE;
 		while ($oPerson = $oSet->Fetch())
 		{
-			$uRequest = DBObjectSearch::FromOQL("SELECT UserRequest AS ur WHERE ur.agent_id = ($oPerson->GetKey()) AND (ur.status != 'closed' OR ur.status != 'resolved') ");
+            $tmpId = $oPerson->GetKey();
+			$uRequest = DBObjectSearch::FromOQL("SELECT UserRequest AS ur WHERE ur.agent_id = ($tmpId) AND (ur.status != 'closed' OR ur.status != 'resolved') ");
 			$uSet = new DBObjectSet($uRequest);
 			if ($uSet->Count() < $min)
 			{

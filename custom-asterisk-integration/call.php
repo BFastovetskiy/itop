@@ -50,7 +50,7 @@ try {
     {
         $orgresp = $client_asterisk->process();
     }
-    $a->close();
+    $client_asterisk->close();
 } catch (Exception $e) {
     IssueLog::Error('custom-asterisk-integration: '.$e->getMessage());
 }

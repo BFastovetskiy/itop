@@ -88,18 +88,6 @@ class AddMenuSampleExtension implements iPopupMenuExtension
                         }
                     }
                 }
-
-			// Only for Contact: (i.e. Teams and Persons)
-			if ($param instanceof Contact)
-			{
-				// add a separator
-				$aResult[] = new SeparatorPopupMenuItem(); // Note: separator does not work in iTop 2.0 due to Trac #698, fixed in 2.0.1
-				
-				// Add a new menu item that triggers a custom JS function defined in our own javascript file: js/call.js
-				$sModuleDir = basename(dirname(__FILE__));
-				$sJSFileUrl = utils::GetAbsoluteUrlModulesRoot().$sModuleDir.'/js/call.js';
-				$aResult[] = new JSPopupMenuItem('_Custom_JS_', 'Custom JS Function...', "MyCustomJSFunction('".addslashes($param->GetName())."')", array($sJSFileUrl));
-			}
 			break;
 			
 			/**

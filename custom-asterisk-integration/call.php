@@ -4,9 +4,10 @@ require_once(APPROOT.'/core/metamodel.class.php');
 require_once(APPROOT.'/application/startup.inc.php');
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$pAgent = 'sip/'.$_REQUEST['agent'];
-$pCustomer = $_REQUEST['customer'];
+$agent = 'sip/'.$_REQUEST['agent'];
+$customer = $_REQUEST['customer'];
 
+use PAMI\Client\Impl\ClientImpl;
 use PAMI\Listener\IEventListener;
 use PAMI\Message\Event\EventMessage;
 use PAMI\Message\Action\OriginateAction;
@@ -30,24 +31,24 @@ class A implements IEventListener
 
 try {
     $options = MetaModel::GetModuleSetting('custom-asterisk-integration', 'options', array());
-    $a = new \PAMI\Client\Impl\ClientImpl($options);
-    $a->registerEventListener(new A($a));
-    $a->open();
+    $client_asterisk = new ClientImpl($options);
+    $client_asterisk->registerEventListener(new A($client_asterisk));
+    $client_asterisk->open();
     $time = time();
     usleep(1000);
-    $actionid = md5(uniqid());
-    $originateMsg = new OriginateAction($pAgent);
-    $originateMsg->setContext('from-internal');
-    $originateMsg->setPriority('1');
-    $originateMsg->setCallerId('Call to Customer');
-    $originateMsg->setExtension($pCustomer);
-    $originateMsg->setAsync(false);
-    $originateMsg->setActionID($actionid);
-    $a->send($originateMsg);
+    $action_id = md5(uniqid());
+    $action = new OriginateAction($agent);
+    $action->setContext('from-internal');
+    $action->setPriority('1');
+    $action->setCallerId('Call to Customer');
+    $action->setExtension($customer);
+    $action->setAsync(false);
+    $action->setActionID($action_id);
+    $client_asterisk->send($action);
 
     while(true)
     {
-        $orgresp = $a->process();
+        $orgresp = $client_asterisk->process();
     }
     $a->close();
 } catch (Exception $e) {

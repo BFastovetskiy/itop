@@ -57,6 +57,11 @@
 					<is_null_allowed>false</is_null_allowed>
 					<on_target_delete>DEL_AUTO</on_target_delete>
 				</field>
+        <field id="filter" xsi:type="AttributeString">
+          <sql>filter</sql>
+					<is_null_allowed>true</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
       </fields>
       <methods/>
       <presentation>
@@ -77,6 +82,9 @@
             <item id="subservice_id">
               <rank>50</rank>
             </item>
+            <item id="filter">
+              <rank>60</rank>
+            </item>
           </items>
         </details>
         <search>
@@ -96,6 +104,9 @@
             <item id="subservice_id">
               <rank>50</rank>
             </item>
+            <item id="filter">
+              <rank>60</rank>
+            </item>
           </items>
         </search>
         <list>
@@ -114,6 +125,9 @@
             </item>
             <item id="subservice_id">
               <rank>50</rank>
+            </item>
+            <item id="filter">
+              <rank>60</rank>
             </item>
           </items>
         </list>

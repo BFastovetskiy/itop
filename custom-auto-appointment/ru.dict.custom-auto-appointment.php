@@ -24,6 +24,9 @@ Dict::Add('RU RU', 'Russian', 'Русский', array(
 	'Class:AutoAppointmentRule/Attribute:subservice_id' => 'Услуга',
 	'Class:AutoAppointmentRule/Attribute:subservice_id+' => '',
 
+	'Class:AutoAppointmentRule/Attribute:filter' => 'Фильтр',
+	'Class:AutoAppointmentRule/Attribute:filter+' => '',
+
 	'Menu:AutoAppointmentRule' => 'Правила автоматического назначения исполнителя',
 	'Menu:AutoAppointmentRule+' => 'Все правила автоматического назначения исполнителя',
 	

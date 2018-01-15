@@ -33,48 +33,70 @@ class AutoAppointment extends ActionNotification
 	public function DoExecute($oTrigger, $aContextArgs)
 	{
 		// Object type checking
-		$class = $aContextArgs['this->object()']->Get('finalclass');
-		if ($class != 'UserRequest' and $class != 'Incident') return;
+		$sClassName = $aContextArgs['this->object()']->Get('finalclass');
+		if ($sClassName != 'UserRequest' and $sClassName != 'Incident') return;
 
 		// Get Ticket, Service and Subcategory
-		$ticketId = $aContextArgs['this->object()']->GetKey();
-		$serviceId = $aContextArgs['this->object()']->Get('service_id');
-		$subServiceId = $aContextArgs['this->object()']->Get('servicesubcategory_id');
-		
-		// The search a team of executors
-		$oSearch = DBObjectSearch::FromOQL("SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ($subServiceId) AND service_id = ($serviceId)");
-		$oSet = new DBObjectSet($oSearch);
-		if ($oSet->Count() == 0) return;
-		$teamId = $oSet->Fetch()->Get('team_id');
+		$iTicketId = $aContextArgs['this->object()']->GetKey();
+		$iServiceId = $aContextArgs['this->object()']->Get('service_id');
+		$iSubServiceId = $aContextArgs['this->object()']->Get('servicesubcategory_id');
 
-		// The searc a executors
-		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.team_id=$teamId");
+		// The search a team of executors
+		$oSearch = DBObjectSearch::FromOQL("SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ($iSubServiceId) AND service_id = ($iServiceId)");
 		$oSet = new DBObjectSet($oSearch);
 		if ($oSet->Count() == 0) return;
-		
-		$agentId = 0;
-		$min = self::FIRST_MIN_VALUE;
+		$oTemplateRule = $oSet->Fetch();
+		$sFilter = $oTemplateRule->Get('filter');
+		$iTeamId = $oTemplateRule->Get('team_id');
+
+		if (!empty($sFilter))
+		{
+			$oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
+            $oSet = new DBObjectSet($oSearch);
+            $oExtraData = $oSet->Fetch();
+            $aRawData = unserialize($oExtraData->Get('data'));
+            $aKeys = explode(";", $sFilter);
+
+            $bResult = true;
+            foreach ($aKeys as $aKey)
+			{
+				$sKey = explode(":", $aKey)[0];
+                $sValue = explode(":", $aKey)[1];
+				if ($aRawData['user_data'][$sKey] == $sValue)
+					$bResult = $bResult & true;
+				else
+                    return;
+			}
+		}
+
+		// The search a executors
+		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.team_id=$iTeamId");
+		$oSet = new DBObjectSet($oSearch);
+		if ($oSet->Count() == 0) return;
+
+		$iAgentId = 0;
+		$iMin = self::FIRST_MIN_VALUE;
 		while ($oPerson = $oSet->Fetch())
 		{
-            $tmpId = $oPerson->GetKey();
-			$uRequest = DBObjectSearch::FromOQL("SELECT UserRequest AS ur WHERE ur.agent_id = ($tmpId) AND (ur.status != 'closed' OR ur.status != 'resolved') ");
-			$uSet = new DBObjectSet($uRequest);
-			if ($uSet->Count() < $min)
+            $iPersonId = $oPerson->GetKey();
+			$oUserSearch = DBObjectSearch::FromOQL("SELECT UserRequest AS ur WHERE ur.agent_id = ($iPersonId) AND (ur.status != 'closed' OR ur.status != 'resolved') ");
+			$oUserSet = new DBObjectSet($oUserSearch);
+			if ($oUserSet->Count() < $iMin)
 			{
-				$min = $uSet->Count();
-				$agentId = $oPerson->GetKey();
+				$iMin = $oUserSet->Count();
+				$iAgentId = $oPerson->GetKey();
 			}
 		}
 
 		// update ticket 
-		$oql = 'SELECT '.$class.' WHERE id = :id';
-		$oSearch = DBObjectSearch::FromOQL($oql);
-		$oSet = new DBObjectSet($oSearch, array(), array('id' => $ticketId));
-		$ticket = $oSet->fetch();
-		$ticket->Set('agent_id', $agentId);
-		$ticket->Set('team_id', $teamId);
-		$ticket->Set('status', 'assigned');
-		$ticket->DBUpdate();
+		$sOQL = 'SELECT '.$sClassName.' WHERE id = :id';
+		$oSearch = DBObjectSearch::FromOQL($sOQL);
+		$oSet = new DBObjectSet($oSearch, array(), array('id' => $iTicketId));
+		$oTicket = $oSet->fetch();
+		$oTicket->Set('agent_id', $iAgentId);
+		$oTicket->Set('team_id', $iTeamId);
+		$oTicket->Set('status', 'assigned');
+		$oTicket->DBUpdate();
 
 		if (MetaModel::IsLogEnabledNotification())
 		{
@@ -91,8 +113,8 @@ class AutoAppointment extends ActionNotification
 			$oLog->Set('trigger_id', $oTrigger->GetKey());
 			$oLog->Set('action_id', $this->GetKey());
 			$oLog->Set('object_id', $aContextArgs['this->object()']->GetKey());
-			$oLog->Set('agent_id', $agentId);
-			$oLog->Set('servicesubcategory_id', $subServiceId);
+			$oLog->Set('agent_id', $iAgentId);
+			$oLog->Set('servicesubcategory_id', $iSubServiceId);
 			$oLog->DBInsertNoReload();
 		}
 		else

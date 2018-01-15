@@ -44,30 +44,35 @@ class AutoAppointment extends ActionNotification
 		// The search a team of executors
 		$oSearch = DBObjectSearch::FromOQL("SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ($iSubServiceId) AND service_id = ($iServiceId)");
 		$oSet = new DBObjectSet($oSearch);
-		if ($oSet->Count() == 0) return;
-		$oTemplateRule = $oSet->Fetch();
-		$sFilter = $oTemplateRule->Get('filter');
-		$iTeamId = $oTemplateRule->Get('team_id');
-
-		if (!empty($sFilter))
+		$iCount = $oSet->Count();
+		if ($iCount == 0) return;
+        $bResult = false;
+		for ($i = 0;  $i < $iCount; $i++)
 		{
-			$oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
-            $oSet = new DBObjectSet($oSearch);
-            $oExtraData = $oSet->Fetch();
-            $aRawData = unserialize($oExtraData->Get('data'));
-            $aKeys = explode(";", $sFilter);
+            $oTemplateRule = $oSet->Fetch();
+            $sFilter = $oTemplateRule->Get('filter');
+            $iTeamId = $oTemplateRule->Get('team_id');
 
-            $bResult = true;
-            foreach ($aKeys as $aKey)
-			{
-				$sKey = explode(":", $aKey)[0];
-                $sValue = explode(":", $aKey)[1];
-				if ($aRawData['user_data'][$sKey] == $sValue)
-					$bResult = $bResult & true;
-				else
-                    return;
-			}
-		}
+            if (!empty($sFilter)) {
+                $oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
+                $oSet2 = new DBObjectSet($oSearch);
+                $oExtraData = $oSet2->Fetch();
+                $aRawData = unserialize($oExtraData->Get('data'));
+                $aKeys = explode(";", $sFilter);
+
+
+                foreach ($aKeys as $aKey) {
+                    $sKey = explode(":", $aKey)[0];
+                    $sValue = explode(":", $aKey)[1];
+                    if ($aRawData['user_data'][$sKey] == $sValue)
+                        $bResult = true;
+                    else
+                        continue;
+                }
+            }
+        }
+
+        if (!$bResult) return;
 
 		// The search a executors
 		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.team_id=$iTeamId");

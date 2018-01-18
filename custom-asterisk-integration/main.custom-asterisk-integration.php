@@ -3,7 +3,7 @@ class AddMenuSampleExtension implements iPopupMenuExtension
 {
 	public static function EnumItems($menu_id, $param)
 	{
-		$result = array();
+        $aResult = array();
 		
 		switch($menu_id)
 		{
@@ -14,50 +14,36 @@ class AddMenuSampleExtension implements iPopupMenuExtension
 			break;
 			
 			case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
-                if ($param instanceof UserRequest)
+                if (($param instanceof UserRequest) || ($param instanceof Incident))
                 {
-                    $active_user_login = $_SESSION['auth_user'];
-                    $agent_search = DBObjectSearch::FromOQL("SELECT Person AS p JOIN UserLocal AS ul ON ul.contactid = p.id WHERE ul.login = '".$active_user_login."'");
-                    $agent_set = new DBObjectSet($agent_search);
-                    if ($agent_set->Count() != 0) {
-						$agent = $agent_set->Fetch();
-                        $agent_phone = $agent->Get('phone');
-                        $customer_id = $param->GetKey();
-                        $customer_search = DBObjectSearch::FromOQL("SELECT Person AS p JOIN UserRequest AS ur ON ur.caller_id = p.id WHERE ur.id = ($customer_id)");
-                        $customer_set = new DBObjectSet($customer_search);
-                        if ($customer_set->Count() != 0) {
-                            $customer = $customer_set->Fetch();
-                            $customer_phone = $customer->Get('phone');
-                            $customer_name = $customer->Get('first_name').' '.$customer->Get('name');
-                            $result[] = new SeparatorPopupMenuItem();
-                            $module_directory = basename(dirname(__FILE__));
-                            $js_file_url = utils::GetAbsoluteUrlModulesRoot().$module_directory.'/js/call.js';
-                            $result[] = new JSPopupMenuItem('CallToCustomer', 'Звонок клиенту '.$customer_name, "CallToCustomer('".$agent_phone."','".$customer_phone."')", array($js_file_url));
-                            $result[] = new SeparatorPopupMenuItem();
+                    try {
+                        $oAgent = UserRights::GetContactObject();
+                        $oCaller = MetaModel::GetObject('Person', $param->Get('caller_id'));
+
+                        if (is_null($oAgent)) {
+                            IssueLog::Warning('CallToCustomerExtension: current user has no contact: ' . UserRights::GetUserId());
+                            return $aResult;
+                        } elseif (is_null($oCaller)) {
+                            IssueLog::Error('CallToCustomerExtension: ticket has no caller: ' . $param->Get('ref'));
+                            return $aResult;
+                        } elseif (!$oCaller->Get('phone')) {
+                            IssueLog::Error('CallToCustomerExtension: caller person has no phone: ' . $oCaller->GetKey());
+                            return $aResult;
                         }
+
+                        $sJsFileUrl = utils::GetAbsoluteUrlModulesRoot().basename(dirname(__FILE__)).'/js/call.js';
+                        $sJsCode = sprintf("CallToCustomer('%s','%s')", $oAgent->Get('phone'), $oCaller->Get('phone'));
+                        $sLabel = Dict::Format('Звонок клиету ', $oCaller->GetName());
+                        //$sLabel = $oCaller->GetName();
+
+                        $aResult[] = new SeparatorPopupMenuItem();
+                        $aResult[] = new JSPopupMenuItem('CallToCustomer', $sLabel, $sJsCode, array($sJsFileUrl));
+                        $aResult[] = new SeparatorPopupMenuItem();
                     }
-                }
-                if ($param instanceof Incident)
-                {
-                    $active_user_login = $_SESSION['auth_user'];
-                    $agent_search = DBObjectSearch::FromOQL("SELECT Person AS p JOIN UserLocal AS ul ON ul.contactid = p.id WHERE ul.login = '".$active_user_login."'");
-                    $agent_set = new DBObjectSet($agent_search);
-                    if ($agent_set->Count() != 0) {
-						$agent = $agent_set->Fetch();
-						$agent_phone = $agent->Get('phone');
-                        $customer_id = $param->GetKey();
-                        $customer_search = DBObjectSearch::FromOQL("SELECT Person AS p JOIN Incident AS ur ON ur.caller_id = p.id WHERE ur.id = ($customer_id)");
-                        $customer_set = new DBObjectSet($customer_search);
-                        if ($customer_set->Count() != 0) {
-                            $customer = $customer_set->Fetch();
-                            $customer_phone = $customer->Get('phone');
-                            $customer_name = $customer->Get('name');
-                            $result[] = new SeparatorPopupMenuItem();
-                            $module_directory = basename(dirname(__FILE__));
-                            $js_file_url = utils::GetAbsoluteUrlModulesRoot().$module_directory.'/js/call.js';
-                            $result[] = new JSPopupMenuItem('CallToCustomer', 'Звонок клиенту '.$customer_name, "CallToCustomer('".$agent_phone."','".$customer_phone."')", array($js_file_url));
-                            $result[] = new SeparatorPopupMenuItem();
-                        }
+                    catch (Exception $ex)
+                    {
+                        IssueLog::Error($ex);
+                        return $aResult;
                     }
                 }
 			break;
@@ -69,7 +55,7 @@ class AddMenuSampleExtension implements iPopupMenuExtension
 			break;
 		
 		}
-		return $result;
+		return $aResult;
 	}
 }
 

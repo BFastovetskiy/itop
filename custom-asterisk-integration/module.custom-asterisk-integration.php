@@ -9,7 +9,7 @@ SetupWebPage::AddModule(
 	array(
 		// Identification
 		//
-		'label' => 'Integrate iTop with Asterisk (v.0.0.1)',
+		'label' => 'Integrate iTop with Asterisk (v.0.0.2)',
 		'category' => 'business',
 
 		// Setup

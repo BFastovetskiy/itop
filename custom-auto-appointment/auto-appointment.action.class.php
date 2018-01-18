@@ -46,33 +46,29 @@ class AutoAppointment extends ActionNotification
 		$oSet = new DBObjectSet($oSearch);
 		$iCount = $oSet->Count();
 		if ($iCount == 0) return;
-        $bResult = false;
+		$bResult = false;
 		for ($i = 0;  $i < $iCount; $i++)
 		{
-            $oTemplateRule = $oSet->Fetch();
-            $sFilter = $oTemplateRule->Get('filter');
-            $iTeamId = $oTemplateRule->Get('team_id');
+			$oTemplateRule = $oSet->Fetch();
+			$sFilter = $oTemplateRule->Get('filter');
+			$iTeamId = $oTemplateRule->Get('team_id');
 
-            if (!empty($sFilter)) {
-                $oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
-                $oSet2 = new DBObjectSet($oSearch);
-                $oExtraData = $oSet2->Fetch();
-                $aRawData = unserialize($oExtraData->Get('data'));
-                $aKeys = explode(";", $sFilter);
+			if (!empty($sFilter)) {
+			$oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
+			$oSet2 = new DBObjectSet($oSearch);
+			$oExtraData = $oSet2->Fetch();
+			$aRawData = unserialize($oExtraData->Get('data'));
+			$aKeys = explode(";", $sFilter);
 
+			foreach ($aKeys as $aKey) {
+				$sKey = explode(":", $aKey)[0];
+				$sValue = explode(":", $aKey)[1];
+				$bResult = ($aRawData['user_data'][$sKey] == $sValue);
+			}
 
-                foreach ($aKeys as $aKey) {
-                    $sKey = explode(":", $aKey)[0];
-                    $sValue = explode(":", $aKey)[1];
-                    if ($aRawData['user_data'][$sKey] == $sValue)
-                        $bResult = true;
-                    else
-                        continue;
-                }
-            }
-        }
-
-        if (!$bResult) return;
+			if ($bResult) break;
+			}
+		}
 
 		// The search a executors
 		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.team_id=$iTeamId");
@@ -83,7 +79,7 @@ class AutoAppointment extends ActionNotification
 		$iMin = self::FIRST_MIN_VALUE;
 		while ($oPerson = $oSet->Fetch())
 		{
-            $iPersonId = $oPerson->GetKey();
+			$iPersonId = $oPerson->GetKey();
 			$oUserSearch = DBObjectSearch::FromOQL("SELECT UserRequest AS ur WHERE ur.agent_id = ($iPersonId) AND (ur.status != 'closed' OR ur.status != 'resolved') ");
 			$oUserSet = new DBObjectSet($oUserSearch);
 			if ($oUserSet->Count() < $iMin)
@@ -107,13 +103,9 @@ class AutoAppointment extends ActionNotification
 		{
 			$oLog = new EventNotificationAutoAppointment();
 			if ($this->IsBeingTested())
-			{
 				$oLog->Set('message', 'Тестирование');
-			}
 			else
-			{
 				$oLog->Set('message', 'Исполнитель назначен');
-			}
 			$oLog->Set('userinfo', UserRights::GetUser());
 			$oLog->Set('trigger_id', $oTrigger->GetKey());
 			$oLog->Set('action_id', $this->GetKey());
@@ -123,13 +115,9 @@ class AutoAppointment extends ActionNotification
 			$oLog->DBInsertNoReload();
 		}
 		else
-		{
 			$oLog = null;
-		}
 		if ($oLog)
-		{
 			$oLog->DBUpdate();
-		}
 	}
 }
 ?>

@@ -26,42 +26,41 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
         <field id="org_id" xsi:type="AttributeExternalKey">
-					<sql>org_id</sql>
-					<target_class>Organization</target_class>
-					<is_null_allowed>false</is_null_allowed>
-					<on_target_delete>DEL_AUTO</on_target_delete>
-				</field>
-				<field id="team_id" xsi:type="AttributeExternalKey">
-					<filter><![CDATA[SELECT Team WHERE org_id = :this->org_id]]></filter>
-					<dependencies>
-						<attribute id="org_id"/>
-					</dependencies>
-					<sql>team_id</sql>
-					<target_class>Team</target_class>
-					<is_null_allowed>false</is_null_allowed>
-					<on_target_delete>DEL_AUTO</on_target_delete>
-				</field>
+          <sql>org_id</sql>
+          <target_class>Organization</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+        </field>
+        <field id="team_id" xsi:type="AttributeExternalKey">
+          <filter><![CDATA[SELECT Team WHERE org_id = :this->org_id]]></filter>
+          <dependencies>
+            <attribute id="org_id"/>
+          </dependencies>
+          <sql>team_id</sql>
+          <target_class>Team</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+        </field>
         <field id="service_id" xsi:type="AttributeExternalKey">
-					<sql>service_id</sql>
-					<target_class>Service</target_class>
-					<is_null_allowed>false</is_null_allowed>
-					<on_target_delete>DEL_AUTO</on_target_delete>
-				</field>
-				<field id="subservice_id" xsi:type="AttributeExternalKey">
-					<filter><![CDATA[SELECT ServiceSubcategory WHERE service_id = :this->service_id]]></filter>
-					<dependencies>
-						<attribute id="service_id"/>
-					</dependencies>
-					<sql>subservice_id</sql>
-					<target_class>ServiceSubcategory</target_class>
-					<is_null_allowed>false</is_null_allowed>
-					<on_target_delete>DEL_AUTO</on_target_delete>
-				</field>
+          <sql>service_id</sql>
+          <target_class>Service</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+        </field>
+        <field id="subservice_id" xsi:type="AttributeExternalKey">
+          <filter><![CDATA[SELECT ServiceSubcategory WHERE service_id = :this->service_id]]></filter>
+          <dependencies>
+            <attribute id="service_id"/>
+          </dependencies>
+          <sql>subservice_id</sql>
+          <target_class>ServiceSubcategory</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+        </field>
         <field id="filter" xsi:type="AttributeString">
           <sql>filter</sql>
-					<is_null_allowed>true</is_null_allowed>
-					<on_target_delete>DEL_AUTO</on_target_delete>
-				</field>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
       </fields>
       <methods/>
       <presentation>

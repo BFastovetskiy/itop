@@ -38,19 +38,32 @@ class AutoAppointment extends ActionNotification
 
         if (!class_exists('UserRequest'))
         {
-            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "UserRequest"');
+            throw new Exception('Не возможно создать экземпляр класса "'.$sClassName.'"');
             return;
         }
         else if (!class_exists('Incident'))
         {
-            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "Incident"');
+            throw new Exception('Не возможно создать экземпляр класса "'.$sClassName.'"');
             return;
         }
 
 		// Get Ticket, Service and Subcategory
-		$iTicketId = $aContextArgs['this->object()']->GetKey();
-		$iServiceId = $aContextArgs['this->object()']->Get('service_id');
-		$iSubServiceId = $aContextArgs['this->object()']->Get('servicesubcategory_id');
+		$oTicket = $aContextArgs['this->object()'];
+		$iTicketId = $oTicket->GetKey();
+		$iServiceId = $oTicket->Get('service_id');
+		$iSubServiceId = $oTicket->Get('servicesubcategory_id');
+		$sTicketStatus = $oTicket->Get('status');
+
+		// The search a approval rule
+		if (class_exists('ApprovalRule'))
+		{
+        $oSearch = DBObjectSearch::FromOQL("SELECT ServiceSubcategory AS ss WHERE ss.id = ($iSubServiceId) AND ss.approvalrule_id != 0");
+        $oSet = new DBObjectSet($oSearch);
+        $iCountApprovalRule = $oSet->Count();
+
+		if ((($iCountApprovalRule != 0) && ($sTicketStatus == 'new')) ||
+			(($iCountApprovalRule != 0) && ($sTicketStatus == 'rejected'))) return;
+		}
 
 		// The search a team of executors
 		$oSearch = DBObjectSearch::FromOQL("SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ($iSubServiceId) AND service_id = ($iServiceId)");
@@ -61,17 +74,19 @@ class AutoAppointment extends ActionNotification
 		for ($i = 0;  $i < $iCount; $i++)
 		{
 			$oTemplateRule = $oSet->Fetch();
-			$sFilter = $oTemplateRule->Get('filter');
 			$iTeamId = $oTemplateRule->Get('team_id');
+            $sFilter = $oTemplateRule->Get('filter');
 
-			if (!empty($sFilter)) {
+			if (!empty($sFilter))
+			{
 			$oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
 			$oSet2 = new DBObjectSet($oSearch);
 			$oExtraData = $oSet2->Fetch();
 			$aRawData = unserialize($oExtraData->Get('data'));
 			$aKeys = explode(";", $sFilter);
 
-			foreach ($aKeys as $aKey) {
+			foreach ($aKeys as $aKey)
+			{
 				$sKey = explode(":", $aKey)[0];
 				$sValue = explode(":", $aKey)[1];
 				$bResult = ($aRawData['user_data'][$sKey] == $sValue);
@@ -91,7 +106,7 @@ class AutoAppointment extends ActionNotification
 		while ($oPerson = $oSet->Fetch())
 		{
 			$iPersonId = $oPerson->GetKey();
-			$oUserSearch = DBObjectSearch::FromOQL("SELECT UserRequest AS ur WHERE ur.agent_id = ($iPersonId) AND (ur.status != 'closed' OR ur.status != 'resolved') ");
+			$oUserSearch = DBObjectSearch::FromOQL("SELECT $sClassName AS ur WHERE ur.agent_id = ($iPersonId) AND (ur.status != 'closed' AND ur.status != 'resolved')");
 			$oUserSet = new DBObjectSet($oUserSearch);
 			if ($oUserSet->Count() < $iMin)
 			{
@@ -117,7 +132,7 @@ class AutoAppointment extends ActionNotification
 			if ($this->IsBeingTested())
 				$oLog->Set('message', 'Тестирование');
 			else
-				$oLog->Set('message', 'Исполнитель назначен');
+				$oLog->Set('message', 'Назначен исполнитель по '.$sClassName);
 			$oLog->Set('userinfo', UserRights::GetUser());
 			$oLog->Set('trigger_id', $oTrigger->GetKey());
 			$oLog->Set('action_id', $this->GetKey());

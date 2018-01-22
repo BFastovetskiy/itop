@@ -36,6 +36,17 @@ class AutoAppointment extends ActionNotification
 		$sClassName = $aContextArgs['this->object()']->Get('finalclass');
 		if ($sClassName != 'UserRequest' and $sClassName != 'Incident') return;
 
+        if (!class_exists('UserRequest'))
+        {
+            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "UserRequest"');
+            return;
+        }
+        else if (!class_exists('Incident'))
+        {
+            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "Incident"');
+            return;
+        }
+
 		// Get Ticket, Service and Subcategory
 		$iTicketId = $aContextArgs['this->object()']->GetKey();
 		$iServiceId = $aContextArgs['this->object()']->Get('service_id');
@@ -96,8 +107,9 @@ class AutoAppointment extends ActionNotification
 		$oTicket = $oSet->fetch();
 		$oTicket->Set('agent_id', $iAgentId);
 		$oTicket->Set('team_id', $iTeamId);
-		$oTicket->Set('status', 'assigned');
 		$oTicket->DBUpdate();
+		$oTicket->ApplyStimulus('ev_assign');
+
 
 		if (MetaModel::IsLogEnabledNotification())
 		{

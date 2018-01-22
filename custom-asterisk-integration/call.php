@@ -1,5 +1,6 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'].'/approot.inc.php');
+require_once('../../approot.inc.php');
+
 require_once(APPROOT.'/core/metamodel.class.php');
 require_once(APPROOT.'/application/startup.inc.php');
 require_once(__DIR__ . '/vendor/autoload.php');
@@ -34,10 +35,12 @@ class A implements IEventListener
     }
 }
 
-    $sAgent = 'sip/'.$_REQUEST['agent'];
-    $sCustomer = $_REQUEST['customer'];
 
     try {
+        LoginWebPage::DoLogin();
+        $sAgent = 'sip/'.$_REQUEST['agent'];
+        $sCustomer = $_REQUEST['customer'];
+    
         // read Asterisk options from options.conf
         $oOptions = MetaModel::GetModuleSetting('custom-asterisk-integration', 'options', array());
 

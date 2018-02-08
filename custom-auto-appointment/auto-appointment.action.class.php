@@ -38,32 +38,19 @@ class AutoAppointment extends ActionNotification
 
         if (!class_exists('UserRequest'))
         {
-            throw new Exception('Не возможно создать экземпляр класса "'.$sClassName.'"');
+            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "UserRequest"');
             return;
         }
         else if (!class_exists('Incident'))
         {
-            throw new Exception('Не возможно создать экземпляр класса "'.$sClassName.'"');
+            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "Incident"');
             return;
         }
 
 		// Get Ticket, Service and Subcategory
-		$oTicket = $aContextArgs['this->object()'];
-		$iTicketId = $oTicket->GetKey();
-		$iServiceId = $oTicket->Get('service_id');
-		$iSubServiceId = $oTicket->Get('servicesubcategory_id');
-		$sTicketStatus = $oTicket->Get('status');
-
-		// The search a approval rule
-		if (class_exists('ApprovalRule'))
-		{
-        $oSearch = DBObjectSearch::FromOQL("SELECT ServiceSubcategory AS ss WHERE ss.id = ($iSubServiceId) AND ss.approvalrule_id != 0");
-        $oSet = new DBObjectSet($oSearch);
-        $iCountApprovalRule = $oSet->Count();
-
-		if ((($iCountApprovalRule != 0) && ($sTicketStatus == 'new')) ||
-			(($iCountApprovalRule != 0) && ($sTicketStatus == 'rejected'))) return;
-		}
+		$iTicketId = $aContextArgs['this->object()']->GetKey();
+		$iServiceId = $aContextArgs['this->object()']->Get('service_id');
+		$iSubServiceId = $aContextArgs['this->object()']->Get('servicesubcategory_id');
 
 		// The search a team of executors
 		$oSearch = DBObjectSearch::FromOQL("SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ($iSubServiceId) AND service_id = ($iServiceId)");
@@ -75,18 +62,24 @@ class AutoAppointment extends ActionNotification
 		{
 			$oTemplateRule = $oSet->Fetch();
 			$iTeamId = $oTemplateRule->Get('team_id');
+			$oSearchTeamLider = DBObjectSearch::FromOQL("SELECT lnkPersonToTeam AS t WHERE t.role_name = 'Team leader' AND t.team_id=($iTeamId)");
+            $oSetTeamLider = new DBObjectSet($oSearchTeamLider);
+            $iTeamLidersId = null;
+            if ($oSetTeamLider->Count() > 0) {
+                $oLiderData = $oSetTeamLider->Fetch();
+                $iTeamLidersId = $oLiderData->Get('person_id');
+			}
+
             $sFilter = $oTemplateRule->Get('filter');
 
-			if (!empty($sFilter))
-			{
+			if (!empty($sFilter)) {
 			$oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
 			$oSet2 = new DBObjectSet($oSearch);
 			$oExtraData = $oSet2->Fetch();
 			$aRawData = unserialize($oExtraData->Get('data'));
 			$aKeys = explode(";", $sFilter);
 
-			foreach ($aKeys as $aKey)
-			{
+			foreach ($aKeys as $aKey) {
 				$sKey = explode(":", $aKey)[0];
 				$sValue = explode(":", $aKey)[1];
 				$bResult = ($aRawData['user_data'][$sKey] == $sValue);
@@ -97,16 +90,21 @@ class AutoAppointment extends ActionNotification
 		}
 
 		// The search a executors
-		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.team_id=$iTeamId");
+		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.role_name != 'Руководитель' AND l.team_id=($iTeamId)");
 		$oSet = new DBObjectSet($oSearch);
 		if ($oSet->Count() == 0) return;
 
 		$iAgentId = 0;
 		$iMin = self::FIRST_MIN_VALUE;
+
+		/*
+		 * var Person $oPerson
+		 */
 		while ($oPerson = $oSet->Fetch())
 		{
+			if (!$oPerson->CheckCompatibleDate(date("Y-m-d H:i:s"))) continue;
 			$iPersonId = $oPerson->GetKey();
-			$oUserSearch = DBObjectSearch::FromOQL("SELECT $sClassName AS ur WHERE ur.agent_id = ($iPersonId) AND (ur.status != 'closed' AND ur.status != 'resolved')");
+			$oUserSearch = DBObjectSearch::FromOQL("SELECT Ticket AS t WHERE t.agent_id = ($iPersonId) AND (t.operational_status != 'closed' OR t.operational_status != 'resolved') ");
 			$oUserSet = new DBObjectSet($oUserSearch);
 			if ($oUserSet->Count() < $iMin)
 			{
@@ -115,7 +113,10 @@ class AutoAppointment extends ActionNotification
 			}
 		}
 
-		// update ticket 
+		if ($iAgentId == 0)
+			$iAgentId = $iTeamLidersId;
+
+		// update ticket
 		$sOQL = 'SELECT '.$sClassName.' WHERE id = :id';
 		$oSearch = DBObjectSearch::FromOQL($sOQL);
 		$oSet = new DBObjectSet($oSearch, array(), array('id' => $iTicketId));
@@ -125,14 +126,13 @@ class AutoAppointment extends ActionNotification
 		$oTicket->DBUpdate();
 		$oTicket->ApplyStimulus('ev_assign');
 
-
 		if (MetaModel::IsLogEnabledNotification())
 		{
 			$oLog = new EventNotificationAutoAppointment();
 			if ($this->IsBeingTested())
 				$oLog->Set('message', 'Тестирование');
 			else
-				$oLog->Set('message', 'Назначен исполнитель по '.$sClassName);
+				$oLog->Set('message', 'Исполнитель назначен');
 			$oLog->Set('userinfo', UserRights::GetUser());
 			$oLog->Set('trigger_id', $oTrigger->GetKey());
 			$oLog->Set('action_id', $this->GetKey());

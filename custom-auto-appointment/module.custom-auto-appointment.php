@@ -1,7 +1,7 @@
 <?php
 SetupWebPage::AddModule(
 	__FILE__,
-	'custom-auto-appointment/1.1.0',
+	'custom-auto-appointment/1.2.0',
 	array(
 		'label' => 'Auto appointment UserRequests & Incidents',
 		'category' => 'business',

@@ -132,13 +132,467 @@
         </list>
       </presentation>
     </class>
+    <class id="Vacation" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>bizmodel</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>auto_appointment_vacation</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="name"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation/>
+      </properties>
+      <fields>
+        <field id="name" xsi:type="AttributeString">
+          <sql>name</sql>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="date" xsi:type="AttributeDate">
+          <sql>date</sql>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="person_id" xsi:type="AttributeExternalKey">
+          <sql>person_id</sql>
+          <target_class>Person</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="person_id">
+              <rank>20</rank>
+            </item>
+            <item id="date">
+              <rank>30</rank>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="date">
+              <rank>20</rank>
+            </item>
+          </items>
+        </search>
+        <list>
+          <items>
+            <item id="date">
+              <rank>10</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+    <class id="Person">
+      <fields>
+        <field id="schedule" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="01_disable">01_disable</value>
+            <value id="02_24_7">02_24_7</value>
+            <value id="03_5_2">03_5_2</value>
+            <value id="04_12_12_48">04_12_12_48</value>
+            <value id="05_24_48">05_24_48</value>
+            <value id="06_24_72">06_24_72</value>
+            <value id="07_schedule">07_schedule</value>
+          </values>
+          <sql>schedule</sql>
+          <default_value>01_disable</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="start" xsi:type="AttributeDateTime" _delta="define">
+          <sql>start</sql>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables>true</always_load_in_tables>
+        </field>
+        <field id="is_allow_hollydays" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="no">no</value>
+            <value id="yes">yes</value>
+          </values>
+          <sql>is_allow_hollydays</sql>
+          <default_value>no</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="vacation_list" xsi:type="AttributeLinkedSet" _delta="define">
+          <linked_class>Vacation</linked_class>
+          <ext_key_to_me>person_id</ext_key_to_me>
+          <edit_mode>in_place</edit_mode>
+        </field>
+        <field id="works_chedule_list" xsi:type="AttributeLinkedSet" _delta="define">
+          <linked_class>WorkSchedule</linked_class>
+          <ext_key_to_me>person_id</ext_key_to_me>
+          <edit_mode>in_place</edit_mode>
+        </field>
+      </fields>
+      <methods>
+        <method id="CheckCompatibleDate" _delta="define">
+          <static>false</static>
+          <access>public</access>
+          <code>
+            <![CDATA[
+	public function CheckCompatibleDate($dCurrentDate) {
+		$sSchedule = $this->Get('schedule');
+		$dStartDate = $this->Get('start');
+        $oCurrentDate = new DateTime($dCurrentDate);
+		$bIsAllowHollydays = $this->Get('is_allow_hollydays');
+		$bResult = false;
+		switch ($sSchedule) {
+			case '01_disable':
+                return $bResult;
+			case '02_24_7':
+				return $bResult = true;
+			case '03_5_2':
+				$oStartDate = new DateTime($dStartDate);
+				$iDay = $oCurrentDate->format("w");
+				if (($iDay > 0) && ($iDay < 6)) {
+				  $tTimeStart = $oStartDate->format("H:i:s");
+				  $tTimeEnd = $oStartDate->add(DateInterval::createFromDateString("8 hours"))->format("H:i:s");
+				  $tTimeCurrent = $oCurrentDate->format("H:i:s");
+				  $bResult = (($tTimeCurrent > $tTimeStart) && ($tTimeCurrent < $tTimeEnd));
+				}
+				break;
+			case '04_12_12_48':
+				$interval = $this->Diff($dCurrentDate, $dStartDate);
+				switch ($interval % 4) {
+					case 0:
+						$dateStart = (new DateTime($dCurrentDate))->setTime(8,0,0);
+						$dateEnd = (new DateTime($dCurrentDate))->setTime(18,0,0);
+						$bResult = (($oCurrentDate >= $dateStart) && ($oCurrentDate <= $dateEnd));
+						break;
+					case 1:
+						$dateStart = (new DateTime($dCurrentDate))->setTime(18,0,0);
+						$dateEnd = (new DateTime($dCurrentDate))->setTime(8,0,0)->add(new DateInterval('P1D'));
+						$bResult = (($oCurrentDate >= $dateStart) && ($oCurrentDate <= $dateEnd));
+						break;
+					default:
+						$bResult = false;
+				}
+				break;
+			case '05_24_48':
+				$interval = $this->Diff($dCurrentDate, $dStartDate);
+				$bResult = (($interval % 3) == 0);
+				break;
+			case '06_24_72':
+				$interval = $this->Diff($dCurrentDate, $dStartDate);
+				$bResult = (($interval % 4) == 0);
+				break;
+            case '07_schedule':
+                $iKey = $this->GetKey();
+                $oCurrentDate = (new DateTime($dCurrentDate))->format('Y-m-d');
+                $oSearch = DBObjectSearch::FromOQL("SELECT WorkSchedule AS ws WHERE ws.person_id = ($iKey) AND ws.date_from = ('$oCurrentDate')");
+                $oSet = new DBObjectSet($oSearch);
+                $iCount = $oSet->Count();
+                if ($iCount == 0) return $bResult;
+                $oWorkSchedule = $oSet->Fetch();
+                $sDateFrom = $oWorkSchedule->Get('date_from');
+                $sFromH = $oWorkSchedule->Get('from_h');
+                $sFromM = $oWorkSchedule->Get('from_m');
+                $sDateTo = $oWorkSchedule->Get('date_to');
+                $sToH = $oWorkSchedule->Get('to_h');
+                $sToM = $oWorkSchedule->Get('to_m');
+
+                $sFrom = $sDateFrom.' '.$sFromH.':'.$sFromM.':00';
+                $sTo = $sDateTo.' '.$sToH.':'.$sToM.':00';
+                $dateStart = (new DateTime($sFrom));
+                $dateEnd = (new DateTime($sTo));
+                $oCurrentDate = new DateTime($dCurrentDate);
+                $bResult = (($oCurrentDate >= $dateStart) && ($oCurrentDate <= $dateEnd));
+
+                break;
+		}
+
+		if (($bResult) && ($bIsAllowHollydays == 'yes')) {
+            $iKey = $this->GetKey();
+            $oCurrentDate = (new DateTime($dCurrentDate))->format('Y-m-d');
+			$oVacationSearch = DBObjectSearch::FromOQL("SELECT Vacation AS v WHERE v.person_id = ($iKey) AND v.date = ('$oCurrentDate')");
+			$oVacationSet = new DBObjectSet($oVacationSearch);
+			$bResult = ($oVacationSet->Count() == 0);
+		}
+
+		return $bResult;
+	}
+            ]]>
+            </code>
+        </method>
+        <method id="Date_Diff" _delta="define">
+          <static>true</static>
+          <access>public</access>
+          <code>
+          <![CDATA[
+    public function Diff($dDate1 , $dDate2 , $differenceFormat = '%a' ) {
+      $datetime1 = date_create($dDate1);
+      $datetime2 = date_create($dDate2);
+      $interval = date_diff($datetime1, $datetime2);
+      return $interval->format($differenceFormat);
+    }
+            ]]>
+          </code>
+        </method>
+      </methods>
+      <presentation>
+        <details _delta="merge">
+          <items>
+            <item id="col:col1" _delta="merge">
+              <rank>50</rank>
+              <items>
+                <item id="fieldset:Person:work_schedule" _delta="define">
+                  <rank>15</rank>
+                  <items>
+                    <item id="schedule">
+                      <rank>10</rank>
+                    </item>
+                    <item id="is_allow_hollydays">
+                      <rank>20</rank>
+                    </item>
+                    <item id="start">
+                      <rank>30</rank>
+                    </item>
+                  </items>
+                </item>              
+              </items>
+            </item>
+            <item id="vacation_list" _delta="define">
+              <rank>100</rank>
+            </item>
+            <item id="works_chedule_list" _delta="define">
+              <rank>110</rank>
+            </item>
+          </items>
+        </details>
+        <search/>
+        <list/>
+      </presentation>
+    </class>
+    <class id="WorkSchedule" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>bizmodel</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>work_schedule</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="date_from"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation/>
+      </properties>
+      <fields>
+        <field id="person_id" xsi:type="AttributeExternalKey">
+          <sql>person_id</sql>
+          <target_class>Person</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+        <field id="date_from" xsi:type="AttributeDate">
+          <sql>date_from</sql>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="from_h" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="00">00</value>
+            <value id="01">01</value>
+            <value id="02">02</value>
+            <value id="03">03</value>
+            <value id="04">04</value>
+            <value id="05">05</value>
+            <value id="06">06</value>
+            <value id="07">07</value>
+            <value id="08">08</value>
+            <value id="09">09</value>
+            <value id="10">10</value>
+            <value id="11">11</value>
+            <value id="12">12</value>
+            <value id="13">13</value>
+            <value id="14">14</value>
+            <value id="15">15</value>
+            <value id="16">16</value>
+            <value id="17">17</value>
+            <value id="18">18</value>
+            <value id="19">19</value>
+            <value id="20">20</value>
+            <value id="21">21</value>
+            <value id="22">22</value>
+            <value id="23">23</value>
+          </values>
+          <sql>from_h</sql>
+          <default_value>00</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="from_m" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="00">00</value>
+            <value id="10">10</value>
+            <value id="20">20</value>
+            <value id="30">30</value>
+            <value id="40">40</value>
+            <value id="50">50</value>
+          </values>
+          <sql>from_m</sql>
+          <default_value>00</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="date_to" xsi:type="AttributeDate">
+          <sql>date_to</sql>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="to_h" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="00">00</value>
+            <value id="01">01</value>
+            <value id="02">02</value>
+            <value id="03">03</value>
+            <value id="04">04</value>
+            <value id="05">05</value>
+            <value id="06">06</value>
+            <value id="07">07</value>
+            <value id="08">08</value>
+            <value id="09">09</value>
+            <value id="10">10</value>
+            <value id="11">11</value>
+            <value id="12">12</value>
+            <value id="13">13</value>
+            <value id="14">14</value>
+            <value id="15">15</value>
+            <value id="16">16</value>
+            <value id="17">17</value>
+            <value id="18">18</value>
+            <value id="19">19</value>
+            <value id="20">20</value>
+            <value id="21">21</value>
+            <value id="22">22</value>
+            <value id="23">23</value>
+          </values>
+          <sql>to_h</sql>
+          <default_value>00</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="to_m" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="00">00</value>
+            <value id="10">10</value>
+            <value id="20">20</value>
+            <value id="30">30</value>
+            <value id="40">40</value>
+            <value id="50">50</value>
+          </values>
+          <sql>to_m</sql>
+          <default_value>00</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details>
+          <items>
+            <item id="person_id">
+              <rang>10</rang>
+            </item>
+            <item id="date_from">
+              <rang>20</rang>
+            </item>
+            <item id="from_h">
+              <rang>30</rang>
+            </item>
+            <item id="from_m">
+              <rang>40</rang>
+            </item>
+            <item id="date_to">
+              <rang>50</rang>
+            </item>
+            <item id="to_h">
+              <rang>60</rang>
+            </item>
+            <item id="to_m">
+              <rang>70</rang>
+            </item>
+          </items>
+        </details>
+        <search>
+          <items>
+            <item id="person_id">
+              <rang>10</rang>
+            </item>
+            <item id="date_from">
+              <rang>20</rang>
+            </item>
+            <item id="from_h">
+              <rang>30</rang>
+            </item>
+            <item id="from_m">
+              <rang>40</rang>
+            </item>
+            <item id="date_to">
+              <rang>50</rang>
+            </item>
+            <item id="to_h">
+              <rang>60</rang>
+            </item>
+            <item id="to_m">
+              <rang>70</rang>
+            </item>
+          </items>
+        </search>
+        <list>
+          <items>
+            <item id="person_id">
+              <rang>10</rang>
+            </item>
+            <item id="date_from">
+              <rang>20</rang>
+            </item>
+            <item id="from_h">
+              <rang>30</rang>
+            </item>
+            <item id="from_m">
+              <rang>40</rang>
+            </item>
+            <item id="date_to">
+              <rang>50</rang>
+            </item>
+            <item id="to_h">
+              <rang>60</rang>
+            </item>
+            <item id="to_m">
+              <rang>70</rang>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
   </classes>
   <menus>
-    <menu id="AutoAppointmentRule" xsi:type="OQLMenuNode" _delta="define">
+    <menu id="Workflow" xsi:type="TemplateMenuNode" _delta="define_if_not_exists">
       <rank>1000</rank>
       <parent>ServiceManagement</parent>
+      <template_file/>
+    </menu>  
+    <menu id="AutoAppointmentRule" xsi:type="OQLMenuNode" _delta="define">
+      <rank>1001</rank>
+      <parent>Workflow</parent>
       <oql>SELECT AutoAppointmentRule</oql>
       <do_search>1</do_search>
     </menu>
   </menus>
-</itop_design>  
+</itop_design>

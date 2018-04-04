@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
   <classes>
+    <class id="Organization">
+      <fields>
+        <field id="person_list" xsi:type="AttributeLinkedSet" _delta="define">
+          <linked_class>Person</linked_class>
+          <ext_key_to_me>org_id</ext_key_to_me>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details _delta="merge">
+          <items>
+            <item id="person_list" _delta="define">
+              <rank>200</rank>
+            </item>
+          </items>
+        </details>
+        <search/>
+        <list/>
+      </presentation>
+    </class>
   </classes>
 </itop_design>

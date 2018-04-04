@@ -5,17 +5,18 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'custom-asterisk-integration/',
+	'custom-zabbix-integration/0.0.1',
+
 	array(
 		// Identification
 		//
-		'label' => 'Integrate iTop with Asterisk (v.0.0.3)',
+		'label' => 'Integrate iTop with Zabbix (v.0.0.1)',
 		'category' => 'business',
 
 		// Setup
 		//
 		'dependencies' => array(
-			'itop-service-mgmt/2.0.0||itop-service-mgmt-provider/2.0.0'
+            'itop-incident-mgmt-itil/2.4.0',
 		),
 		'mandatory' => false,
 		'visible' => true,
@@ -23,13 +24,14 @@ SetupWebPage::AddModule(
 		// Components
 		//
 		'datamodel' => array(
-			'main.custom-asterisk-integration.php'
+			'model.custom-zabbix-integration.php',
+            'zabbix-event-close.php'
 		),
 		'webservice' => array(
 
 		),
 		'data.struct' => array(
-			// add your 'structure' definition XML files here,
+
 		),
 		'data.sample' => array(
 			// add your sample data XML files here,
@@ -44,15 +46,11 @@ SetupWebPage::AddModule(
 		//
 		'settings' => array(
 			'options' => array(
-				'host' => 'asterisk-server-address',
-				'scheme' => 'tcp://',
-				'port' => 5038,
-				'username' => 'itop-user',
-				'secret' => 'itop-user-password',
-				'connect_timeout' => 10000,
-				'read_timeout' => 100000
-			)
-		)
+                'zabbix_host' => 'url',
+                'zabbix_user' => 'user',
+                'zabbix_user_password' => 'password',
+            )
+		),
 	)
 );
 

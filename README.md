@@ -15,9 +15,10 @@ Many thanks to the Russian community iTop. Although they did not answer my quest
 6. Added to DatabaseSchema the impact on WebApplications 
 7. Add cross link WebApplication on WebApplication
 8. Added translation into Russian to the Advanced Approval Module
-9. Added to the iTop module auto appointment 
-10. Added to the iTop module integration with Asterisk
-11. iTop workflow module (in developing)
+9. iTop the module of auto appointment executor. Supports working schedules.
+10. Added to the iTop module integration with Asterisk. Only outgoing calls.
+11. iTop workflow module (implemented). Available only on request.
+12. Added integration module with Zabbix. Integration is partial, it is possible to only close the event in monitoring after the incident closure in iTop
 
 ### Plans:
 
@@ -26,7 +27,7 @@ Many thanks to the Russian community iTop. Although they did not answer my quest
 3. Add new CMDB object - DBCluster
 4. Add objects to the Docker environment
 5. ~~Add new CMDB trigger action for notification with Telegram~~
-6. Add new CMDB trigger action for create/update objects in monitoring system Zabbix
+6. ~~Add new CMDB trigger action for create/update objects in monitoring system Zabbix~~
 7. ~~Added to the iTop module integration with Asterisk~~
 
 ### Other

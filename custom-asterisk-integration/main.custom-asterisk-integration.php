@@ -34,7 +34,6 @@ class AddMenuSampleExtension implements iPopupMenuExtension
                         $sJsFileUrl = utils::GetAbsoluteUrlModulesRoot().basename(dirname(__FILE__)).'/js/call.js';
                         $sJsCode = sprintf("CallToCustomer('%s','%s')", $oAgent->Get('phone'), $oCaller->Get('phone'));
                         $sLabel = Dict::Format('Звонок клиету ', $oCaller->GetName());
-                        //$sLabel = $oCaller->GetName();
 
                         $aResult[] = new SeparatorPopupMenuItem();
                         $aResult[] = new JSPopupMenuItem('CallToCustomer', $sLabel, $sJsCode, array($sJsFileUrl));

@@ -39,12 +39,10 @@ class AutoAppointment extends ActionNotification
         if (!class_exists('UserRequest'))
         {
             throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "UserRequest"');
-            return;
         }
         else if (!class_exists('Incident'))
         {
             throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "Incident"');
-            return;
         }
 
 		// Get Ticket, Service and Subcategory
@@ -58,13 +56,13 @@ class AutoAppointment extends ActionNotification
 		$iCount = $oSet->Count();
 		if ($iCount == 0) return;
 		$bResult = false;
+        $iTeamLidersId = null;
 		for ($i = 0;  $i < $iCount; $i++)
 		{
 			$oTemplateRule = $oSet->Fetch();
 			$iTeamId = $oTemplateRule->Get('team_id');
 			$oSearchTeamLider = DBObjectSearch::FromOQL("SELECT lnkPersonToTeam AS t WHERE t.role_name = 'Team leader' AND t.team_id=($iTeamId)");
             $oSetTeamLider = new DBObjectSet($oSearchTeamLider);
-            $iTeamLidersId = null;
             if ($oSetTeamLider->Count() > 0) {
                 $oLiderData = $oSetTeamLider->Fetch();
                 $iTeamLidersId = $oLiderData->Get('person_id');
@@ -73,19 +71,19 @@ class AutoAppointment extends ActionNotification
             $sFilter = $oTemplateRule->Get('filter');
 
 			if (!empty($sFilter)) {
-			$oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
-			$oSet2 = new DBObjectSet($oSearch);
-			$oExtraData = $oSet2->Fetch();
-			$aRawData = unserialize($oExtraData->Get('data'));
-			$aKeys = explode(";", $sFilter);
+                $oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
+                $oSet2 = new DBObjectSet($oSearch);
+                $oExtraData = $oSet2->Fetch();
+                $aRawData = unserialize($oExtraData->Get('data'));
+                $aKeys = explode(";", $sFilter);
 
-			foreach ($aKeys as $aKey) {
-				$sKey = explode(":", $aKey)[0];
-				$sValue = explode(":", $aKey)[1];
-				$bResult = ($aRawData['user_data'][$sKey] == $sValue);
-			}
+                foreach ($aKeys as $aKey) {
+                    $sKey = explode(":", $aKey)[0];
+                    $sValue = explode(":", $aKey)[1];
+                    $bResult = ($aRawData['user_data'][$sKey] == $sValue);
+                }
 
-			if ($bResult) break;
+                if ($bResult) break;
 			}
 		}
 
@@ -98,8 +96,8 @@ class AutoAppointment extends ActionNotification
 		$iMin = self::FIRST_MIN_VALUE;
 
 		/*
-		 * var Person $oPerson
-		 */
+         * var Person $oPerson
+         */
 		while ($oPerson = $oSet->Fetch())
 		{
 			if (!$oPerson->CheckCompatibleDate(date("Y-m-d H:i:s"))) continue;
@@ -123,8 +121,8 @@ class AutoAppointment extends ActionNotification
 		$oTicket = $oSet->fetch();
 		$oTicket->Set('agent_id', $iAgentId);
 		$oTicket->Set('team_id', $iTeamId);
-		$oTicket->DBUpdate();
 		$oTicket->ApplyStimulus('ev_assign');
+        $oTicket->DBUpdate();
 
 		if (MetaModel::IsLogEnabledNotification())
 		{

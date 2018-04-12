@@ -76,5 +76,7 @@ Dict::Add('RU RU', 'Russian', 'Русский', array(
 	'Class:Person/Attribute:works_chedule_list' => 'Рабочий график',
 	'Class:Person/Attribute:works_chedule_list+' => 'График работы специалиста',
 
+    'Menu:Workflows' => 'Управление бизнес процессами',
+
 ));
 ?>

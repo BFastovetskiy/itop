@@ -1,12 +1,13 @@
 <?php
 SetupWebPage::AddModule(
 	__FILE__,
-	'custom-auto-appointment/1.2.0',
+	'custom-auto-appointment/1.1.0',
 	array(
 		'label' => 'Auto appointment UserRequests & Incidents',
 		'category' => 'business',
 		'dependencies' => array(
-			'itop-request-template/2.0.0'
+			'itop-request-template/2.0.0',
+            'itop-profiles-itil/1.0.0'
 		),
 		'mandatory' => false,
 		'visible' => true,
@@ -22,7 +23,7 @@ SetupWebPage::AddModule(
 		'data.sample' => array(
 		),
 		'doc.manual_setup' => '',
-		'doc.more_information' => '', 
+		'doc.more_information' => '',
 		'settings' => array(
 		),
 	)

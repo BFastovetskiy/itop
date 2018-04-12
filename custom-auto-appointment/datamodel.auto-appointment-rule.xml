@@ -146,9 +146,17 @@
             <attribute id="name"/>
           </attributes>
         </naming>
+        <order>
+          <columns>
+            <column id="date" ascending="false"/>
+          </columns>
+        </order>
         <display_template/>
         <icon/>
         <reconciliation/>
+        <archive>
+          <enabled>true</enabled>
+        </archive>
       </properties>
       <fields>
         <field id="name" xsi:type="AttributeString">
@@ -329,13 +337,13 @@
 		return $bResult;
 	}
             ]]>
-            </code>
+          </code>
         </method>
         <method id="Date_Diff" _delta="define">
           <static>true</static>
           <access>public</access>
           <code>
-          <![CDATA[
+            <![CDATA[
     public function Diff($dDate1 , $dDate2 , $differenceFormat = '%a' ) {
       $datetime1 = date_create($dDate1);
       $datetime2 = date_create($dDate2);
@@ -365,7 +373,7 @@
                       <rank>30</rank>
                     </item>
                   </items>
-                </item>              
+                </item>
               </items>
             </item>
             <item id="vacation_list" _delta="define">
@@ -397,6 +405,9 @@
         <display_template/>
         <icon/>
         <reconciliation/>
+        <archive>
+          <enabled>true</enabled>
+        </archive>
       </properties>
       <fields>
         <field id="person_id" xsi:type="AttributeExternalKey">
@@ -583,16 +594,56 @@
     </class>
   </classes>
   <menus>
-    <menu id="Workflow" xsi:type="TemplateMenuNode" _delta="define_if_not_exists">
+    <menu id="Workflows" xsi:type="TemplateMenuNode" _delta="define_if_not_exists">
       <rank>1000</rank>
       <parent>ServiceManagement</parent>
       <template_file/>
-    </menu>  
+    </menu>
     <menu id="AutoAppointmentRule" xsi:type="OQLMenuNode" _delta="define">
       <rank>1001</rank>
-      <parent>Workflow</parent>
+      <parent>Workflows</parent>
       <oql>SELECT AutoAppointmentRule</oql>
       <do_search>1</do_search>
     </menu>
   </menus>
+  <user_rights>
+    <groups>
+      <group id="TeamLeader_Person" _delta="define">
+        <classes>
+          <class id="Person"/>
+        </classes>
+      </group>
+      <group id="TeamLeader_WorkSchedule" _delta="define">
+        <classes>
+        <class id="Vacation"/>
+        <class id="WorkSchedule"/>          
+        </classes>
+      </group>
+    </groups>    
+    <profiles>
+      <profile id="51" _delta="define">
+        <name>Team leader</name>
+        <description>Team leader setting up an employee's work schedule</description>
+        <groups>
+          <group id="*">
+            <actions>
+              <action id="action:read">allow</action>
+              <action id="action:bulk read">allow</action>
+            </actions>
+          </group>
+          <group id="TeamLeader_Person">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+          <group id="TeamLeader_WorkSchedule">
+            <actions>
+            <action id="action:write">allow</action>
+            <action id="action:bulk write">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
+    </profiles>
+  </user_rights>
 </itop_design>

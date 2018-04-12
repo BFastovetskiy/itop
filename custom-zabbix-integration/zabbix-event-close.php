@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * ZabbixEventClose
@@ -87,7 +87,7 @@ class ZabbixEventClose  implements iApplicationObjectExtension
 
     /**
      * Check object then compatible
-     * @param mixed $oObj 
+     * @param mixed $oObj
      * @return boolean
      */
     private static function IsTargetObject($oObj)
@@ -159,7 +159,7 @@ class ZabbixEventCloser {
             'jsonrpc' => '2.0',
             'method' => 'event.acknowledge',
             'params' => array(
-                'eventids' => $zabbix_ticket_id,
+                'eventids' => explode(',', $zabbix_ticket_id),
                 'message' => $message,
                 'action' => 0
             ),
@@ -179,7 +179,7 @@ class ZabbixEventCloser {
 
     /**
      * Send request to Zabbix
-     * @param mixed $data 
+     * @param mixed $data
      * @return mixed
      */
     private function Call($data)

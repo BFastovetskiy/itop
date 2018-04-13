@@ -3,7 +3,7 @@
   <classes>
     <class id="Incident">
       <fields>
-        <field id="zabbix_ticket_id" xsi:type="AttributeString" _delta="define">
+        <field id="zabbix_ticket_id" xsi:type="AttributeText" _delta="define">
           <sql>zabbix_ticket_id</sql>
           <default_value/>
           <is_null_allowed>true</is_null_allowed>

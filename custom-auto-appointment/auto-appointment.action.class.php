@@ -32,63 +32,48 @@ class AutoAppointment extends ActionNotification
 
 	public function DoExecute($oTrigger, $aContextArgs)
 	{
-		// Object type checking
+		// Получение типа класса
 		$sClassName = $aContextArgs['this->object()']->Get('finalclass');
-		if ($sClassName != 'UserRequest' and $sClassName != 'Incident') return;
 
+        // проверяем на соответствие типов
+        if ($sClassName != 'UserRequest' and $sClassName != 'Incident') return;
+
+        // проверка существования классов
         if (!class_exists('UserRequest'))
         {
-            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "UserRequest"');
+            throw new Exception('Could not create a ticket after the service of type '.$sClassName.': unknown class "UserRequest"');
         }
         else if (!class_exists('Incident'))
         {
-            throw new Exception('Could not create a ticket after the service '.$oServiceSubcategory->Get('friendlyname').' of type '.$sType.': unknown class "Incident"');
+            throw new Exception('Could not create a ticket after the service of type '.$sClassName.': unknown class "Incident"');
         }
 
-		// Get Ticket, Service and Subcategory
+        // Получение ID тикета, услугии, подкатегории услуги
 		$iTicketId = $aContextArgs['this->object()']->GetKey();
 		$iServiceId = $aContextArgs['this->object()']->Get('service_id');
 		$iSubServiceId = $aContextArgs['this->object()']->Get('servicesubcategory_id');
 
 		// The search a team of executors
-		$oSearch = DBObjectSearch::FromOQL("SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ($iSubServiceId) AND service_id = ($iServiceId)");
-		$oSet = new DBObjectSet($oSearch);
+		$oSet = new DBObjectSet(DBObjectSearch::FromOQL('SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ('.$iSubServiceId.') AND service_id = ('.$iServiceId.')'));
 		$iCount = $oSet->Count();
 		if ($iCount == 0) return;
 		$bResult = false;
-        $iTeamLidersId = null;
+        $iTeamLeaderId = null;
 		for ($i = 0;  $i < $iCount; $i++)
 		{
 			$oTemplateRule = $oSet->Fetch();
 			$iTeamId = $oTemplateRule->Get('team_id');
-			$oSearchTeamLider = DBObjectSearch::FromOQL("SELECT lnkPersonToTeam AS t WHERE t.role_name = 'Team leader' AND t.team_id=($iTeamId)");
-            $oSetTeamLider = new DBObjectSet($oSearchTeamLider);
-            if ($oSetTeamLider->Count() > 0) {
-                $oLiderData = $oSetTeamLider->Fetch();
-                $iTeamLidersId = $oLiderData->Get('person_id');
-			}
-
             $sFilter = $oTemplateRule->Get('filter');
-
-			if (!empty($sFilter)) {
-                $oSearch = DBObjectSearch::FromOQL("SELECT TemplateExtraData WHERE obj_key = ($iTicketId)");
-                $oSet2 = new DBObjectSet($oSearch);
-                $oExtraData = $oSet2->Fetch();
-                $aRawData = unserialize($oExtraData->Get('data'));
-                $aKeys = explode(";", $sFilter);
-
-                foreach ($aKeys as $aKey) {
-                    $sKey = explode(":", $aKey)[0];
-                    $sValue = explode(":", $aKey)[1];
-                    $bResult = ($aRawData['user_data'][$sKey] == $sValue);
-                }
-
+            $iTeamLeaderId = $this->GetLeaderTeam($iTeamId);
+            
+            if (!empty($sFilter)) {
+                $bResult = $this->CheckFilter($sFilter, $iTicketId);
                 if ($bResult) break;
 			}
 		}
 
 		// The search a executors
-		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.role_name != 'Руководитель' AND l.team_id=($iTeamId)");
+		$oSearch = DBObjectSearch::FromOQL("SELECT Person AS p JOIN lnkPersonToTeam AS l ON l.person_id = p.id WHERE l.role_name != 'Team leader' AND l.team_id=($iTeamId)");
 		$oSet = new DBObjectSet($oSearch);
 		if ($oSet->Count() == 0) return;
 
@@ -112,7 +97,7 @@ class AutoAppointment extends ActionNotification
 		}
 
 		if ($iAgentId == 0)
-			$iAgentId = $iTeamLidersId;
+			$iAgentId = $iTeamLeaderId;
 
 		// update ticket
 		$sOQL = 'SELECT '.$sClassName.' WHERE id = :id';
@@ -137,12 +122,41 @@ class AutoAppointment extends ActionNotification
 			$oLog->Set('object_id', $aContextArgs['this->object()']->GetKey());
 			$oLog->Set('agent_id', $iAgentId);
 			$oLog->Set('servicesubcategory_id', $iSubServiceId);
-			$oLog->DBInsertNoReload();
+			$oLog->DBInsert();
 		}
-		else
-			$oLog = null;
-		if ($oLog)
-			$oLog->DBUpdate();
 	}
+
+    /**
+     * Summary of GetTeamLeader
+     * @param integer $iTeamId
+     * @return integer
+     */
+    private function GetLeaderTeam($iTeamId) {
+        $iTeamLeaderId = 0;
+        $oSetTeamLeader = new DBObjectSet(DBObjectSearch::FromOQL("SELECT lnkPersonToTeam AS t WHERE t.role_name = 'Team leader' AND t.team_id=(".$iTeamId.")"));
+        if ($oSetTeamLeader->Count() > 0) {
+            $iTeamLeaderId  = $oSetTeamLeader->Fetch()->Get('person_id');
+        }
+        return $iTeamLeaderId;
+    }
+
+    private function CheckFilter($sFilter, $iTicketId) {
+        $bResult = false;
+        $oSet = new DBObjectSet(DBObjectSearch::FromOQL('SELECT TemplateExtraData WHERE obj_key = ('.$iTicketId.')'));
+        $iCount = $oSet->Count();
+        if ($iCount === 0) return $bResult;
+
+        $oExtraData = $oSet->Fetch();
+        $aRawData = unserialize($oExtraData->Get('data'));
+        $aKeys = explode(";", $sFilter);
+
+        foreach ($aKeys as $aKey) {
+            $sKey = explode(":", $aKey)[0];
+            $sValue = explode(":", $aKey)[1];
+            $bResult = ($aRawData['user_data'][$sKey] == $sValue);
+        }
+
+        return $bResult;
+    }
 }
 ?>

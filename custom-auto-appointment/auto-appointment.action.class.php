@@ -50,11 +50,12 @@ class AutoAppointment extends ActionNotification
 
         // Получение ID тикета, услугии, подкатегории услуги
 		$iTicketId = $aContextArgs['this->object()']->GetKey();
+		$iOrgId = $aContextArgs['this->object()']->Get('org_id');
 		$iServiceId = $aContextArgs['this->object()']->Get('service_id');
 		$iSubServiceId = $aContextArgs['this->object()']->Get('servicesubcategory_id');
 
 		// The search a team of executors
-		$oSet = new DBObjectSet(DBObjectSearch::FromOQL('SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ('.$iSubServiceId.') AND service_id = ('.$iServiceId.')'));
+		$oSet = new DBObjectSet(DBObjectSearch::FromOQL('SELECT AutoAppointmentRule AS r WHERE r.subservice_id = ('.$iSubServiceId.') AND service_id = ('.$iServiceId.') AND org_id = ('.$iOrgId.')'));
 		$iCount = $oSet->Count();
 		if ($iCount == 0) return;
 		$bResult = false;
